@@ -1,0 +1,202 @@
+
+Kunoichi.png
+size: 2048,1024
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+charactor_import3/All
+  rotate: false
+  xy: 1, 1
+  size: 593, 957
+  orig: 593, 957
+  offset: 0, 0
+  index: -1
+charactor_import3/Hand_L
+  rotate: false
+  xy: 1097, 223
+  size: 116, 148
+  orig: 116, 148
+  offset: 0, 0
+  index: -1
+charactor_import3/Arm_L
+  rotate: false
+  xy: 1306, 447
+  size: 121, 232
+  orig: 121, 232
+  offset: 0, 0
+  index: -1
+charactor_import3/Mant_Back
+  rotate: false
+  xy: 1097, 1
+  size: 339, 220
+  orig: 339, 220
+  offset: 0, 0
+  index: -1
+charactor_import3/Foot_L_Up_Back
+  rotate: false
+  xy: 1696, 714
+  size: 103, 249
+  orig: 103, 249
+  offset: 0, 0
+  index: -1
+charactor_import3/Foot_L_Down
+  rotate: false
+  xy: 1903, 714
+  size: 93, 249
+  orig: 93, 249
+  offset: 0, 0
+  index: -1
+charactor_import3/Foot_L_Up
+  rotate: false
+  xy: 1801, 714
+  size: 100, 249
+  orig: 100, 249
+  offset: 0, 0
+  index: -1
+charactor_import3/Foot_R_Up_Back
+  rotate: false
+  xy: 1438, 1
+  size: 104, 190
+  orig: 104, 190
+  offset: 0, 0
+  index: -1
+charactor_import3/Foot_R_Down
+  rotate: false
+  xy: 1608, 714
+  size: 86, 298
+  orig: 86, 298
+  offset: 0, 0
+  index: -1
+charactor_import3/Foot_R_Up
+  rotate: false
+  xy: 1158, 818
+  size: 99, 187
+  orig: 99, 187
+  offset: 0, 0
+  index: -1
+charactor_import3/Body_Bottom
+  rotate: false
+  xy: 941, 818
+  size: 215, 132
+  orig: 215, 132
+  offset: 0, 0
+  index: -1
+charactor_import3/Mant_L_Front
+  rotate: false
+  xy: 1635, 265
+  size: 87, 248
+  orig: 87, 248
+  offset: 0, 0
+  index: -1
+charactor_import3/Mant_R_Front
+  rotate: false
+  xy: 1554, 1
+  size: 192, 262
+  orig: 192, 262
+  offset: 0, 0
+  index: -1
+charactor_import3/Hair_Back
+  rotate: false
+  xy: 596, 1
+  size: 499, 433
+  orig: 499, 433
+  offset: 0, 0
+  index: -1
+charactor_import3/Arm_R_Back
+  rotate: false
+  xy: 1306, 714
+  size: 149, 260
+  orig: 149, 260
+  offset: 0, 0
+  index: -1
+charactor_import3/Body_Top
+  rotate: false
+  xy: 1438, 447
+  size: 195, 265
+  orig: 195, 265
+  offset: 0, 0
+  index: -1
+charactor_import3/Hand_R
+  rotate: false
+  xy: 1306, 223
+  size: 246, 222
+  orig: 246, 222
+  offset: 0, 0
+  index: -1
+charactor_import3/Arm_R
+  rotate: false
+  xy: 1457, 714
+  size: 149, 260
+  orig: 149, 260
+  offset: 0, 0
+  index: -1
+charactor_import3/Face
+  rotate: false
+  xy: 596, 436
+  size: 343, 410
+  orig: 343, 410
+  offset: 0, 0
+  index: -1
+charactor_import3/Eyes
+  rotate: false
+  xy: 596, 931
+  size: 258, 81
+  orig: 258, 81
+  offset: 0, 0
+  index: -1
+charactor_import3/Eyes_front_half
+  rotate: false
+  xy: 856, 952
+  size: 257, 62
+  orig: 257, 62
+  offset: 0, 0
+  index: -1
+charactor_import3/Eyes_front_close
+  rotate: false
+  xy: 1635, 515
+  size: 253, 76
+  orig: 253, 76
+  offset: 0, 0
+  index: -1
+charactor_import3/Eyes_front
+  rotate: false
+  xy: 596, 848
+  size: 258, 81
+  orig: 258, 81
+  offset: 0, 0
+  index: -1
+charactor_import3/Hair_Front
+  rotate: false
+  xy: 941, 436
+  size: 363, 380
+  orig: 363, 380
+  offset: 0, 0
+  index: -1
+charactor_import3/Foot_R_Point
+  rotate: false
+  xy: 1097, 373
+  size: 54, 54
+  orig: 54, 54
+  offset: 0, 0
+  index: -1
+charactor_import3/Foot_L_Point
+  rotate: false
+  xy: 856, 848
+  size: 57, 56
+  orig: 57, 56
+  offset: 0, 0
+  index: -1
+charactor_import3/Arm_R_Point
+  rotate: false
+  xy: 1153, 373
+  size: 51, 51
+  orig: 51, 51
+  offset: 0, 0
+  index: -1
+charactor_import3/Arm_L_Point
+  rotate: false
+  xy: 1115, 952
+  size: 33, 32
+  orig: 33, 32
+  offset: 0, 0
+  index: -1

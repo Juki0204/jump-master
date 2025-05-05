@@ -16,7 +16,7 @@ class Player {
     this.sprite.setCollideWorldBounds(true);
     this.sprite.setScale(0.5);
     this.sprite.setOrigin(0.5, 1);
-    this.sprite!.body!.setSize(this.sprite.width * 0.2, this.sprite.height * 0.78);
+    this.sprite!.body!.setSize(this.sprite.width * 0.16, this.sprite.height * 0.78);
     this.sprite!.body!.setOffset(this.sprite.width / 2, this.sprite.height * 0.18);
     this.sprite.play('idle');
   }
@@ -82,23 +82,23 @@ class Player {
     if (this.direction === 'right') {
       this.standardOffsetX = this.sprite.width / 2;
     } else {
-      this.standardOffsetX = this.sprite.width / 3;
+      this.standardOffsetX = this.sprite.width / 2 - 65;
     }
 
     if (cursors.left.isDown) {
       this.sprite.setVelocityX(-300);
       this.sprite.setFlipX(true);
+      this.sprite!.body!.setOffset(this.standardOffsetX, this.sprite.height * 0.18);
       if (!this.isJump && onGround) {
         this.sprite.anims.play('run', true);
-        this.sprite!.body!.setOffset(this.standardOffsetX, this.sprite.height * 0.18);
       }
       this.direction = 'left';
     } else if (cursors.right.isDown) {
       this.sprite.setVelocityX(300);
       this.sprite.setFlipX(false);
+      this.sprite!.body!.setOffset(this.standardOffsetX, this.sprite.height * 0.18);
       if (!this.isJump && onGround) {
         this.sprite.anims.play('run', true);
-        this.sprite!.body!.setOffset(this.standardOffsetX, this.sprite.height * 0.18);
       }
       this.direction = 'right';
     } else {

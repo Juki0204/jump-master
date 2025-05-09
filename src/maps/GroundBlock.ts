@@ -7,6 +7,7 @@ class GroundBlock {
     x: number,
     y: number,
     length: number = 1,
+    direction: 'left' | 'right' = 'right',
     type: 'grass' | 'purple' | 'sand' | 'snow' | 'stone' = 'grass',
   ) {
     const frameMap = {
@@ -47,22 +48,37 @@ class GroundBlock {
     if (length === 1) { //長さ1のブロック
       const block = scene.add.sprite(x, y, 'maps', frameName.single);
       scene.physics.add.existing(block, true);
-      block.setOrigin(0, 0);
+      if (direction === 'left') {
+        block.setOrigin(1, 0);
+      } else if (direction === 'right') {
+        block.setOrigin(0, 0);
+      }
       (block.body! as Phaser.Physics.Arcade.Body).updateFromGameObject();
 
       group.add(block);
 
     } else if (length === 2) { //長さ2のブロック
       const blockList = [];
+      let resultBlockList;
 
       const leftBlock = scene.add.sprite(x, y, 'maps', frameName.left);
       blockList.push(leftBlock);
       const rightBlock = scene.add.sprite(x + 64, y, 'maps', frameName.right);
       blockList.push(rightBlock);
 
+      if (direction === 'right') {
+        resultBlockList = blockList;
+      } else {
+        resultBlockList = blockList.reverse();
+      }
+
       blockList.forEach(block => {
         scene.physics.add.existing(block, true);
-        block.setOrigin(0, 0);
+        if (direction === 'right') {
+          block.setOrigin(0, 0);
+        } else {
+          block.setOrigin(1, 0);
+        }
         (block.body! as Phaser.Physics.Arcade.Body).updateFromGameObject();
         group.add(block);
       });
@@ -77,6 +93,7 @@ class GroundBlock {
 
     } else { //長さ3以上のブロック
       const blockList = [];
+      let resultBlockList;
       const leftBlock = scene.add.sprite(x, y, 'maps', frameName.left);
       blockList.push(leftBlock);
 
@@ -88,9 +105,19 @@ class GroundBlock {
       const rightBlock = scene.add.sprite(x + (length - 1) * 64, y, 'maps', frameName.right);
       blockList.push(rightBlock);
 
+      if (direction === 'right') {
+        resultBlockList = blockList;
+      } else {
+        resultBlockList = blockList.reverse();
+      }
+
       blockList.forEach(block => {
         scene.physics.add.existing(block, true);
-        block.setOrigin(0, 0);
+        if (direction === 'right') {
+          block.setOrigin(0, 0);
+        } else {
+          block.setOrigin(1, 0);
+        }
         (block.body! as Phaser.Physics.Arcade.Body).updateFromGameObject();
         group.add(block);
       });

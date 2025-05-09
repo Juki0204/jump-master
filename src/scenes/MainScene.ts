@@ -5,6 +5,7 @@ import GroundBlock from "../maps/GroundBlock";
 class MainScene extends Phaser.Scene {
   private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
   private spaceKey!: Phaser.Input.Keyboard.Key;
+  private escKey!: Phaser.Input.Keyboard.Key;
   private player!: Player;
   private platform!: Phaser.Physics.Arcade.StaticGroup;
 
@@ -21,6 +22,7 @@ class MainScene extends Phaser.Scene {
   create() {
     this.cursors = this.input!.keyboard!.createCursorKeys();
     this.spaceKey = this.input!.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+    this.escKey = this.input!.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
 
     //ステージの広さ
     const mapWidth = 1280;
@@ -37,7 +39,10 @@ class MainScene extends Phaser.Scene {
     // this.platform.create(680, 3700, 'ground').setScale(0.3, 0.8).setOrigin(0.5, 1).refreshBody();
     // this.platform.create(1000, 3650, 'ground').setScale(0.2, 0.8).setOrigin(0.5, 1).refreshBody();
     // this.platform.create(1200, 3550, 'ground').setScale(0.2, 0.8).setOrigin(0.5, 1).refreshBody();
-    new GroundBlock(this, this.platform, 400, 3850, 3, 'grass');
+    new GroundBlock(this, this.platform, 360, 3800, 3, 'grass');
+    new GroundBlock(this, this.platform, 640, 3650, 3, 'grass');
+    new GroundBlock(this, this.platform, 950, 3600, 2, 'grass');
+    new GroundBlock(this, this.platform, 1150, 3500, 2, 'grass');
 
     this.cameras.main.setBounds(0, 0, mapWidth, mapHeight); //カメラの移動範囲
     this.physics.world.setBounds(0, 0, mapWidth, mapHeight) //物理演算の範囲
@@ -58,6 +63,10 @@ class MainScene extends Phaser.Scene {
 
   update() {
     this.player.update(this.cursors, this.spaceKey);
+
+    if (this.escKey.isDown) {
+      this.scene.restart();
+    }
   }
 }
 

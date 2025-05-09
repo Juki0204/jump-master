@@ -57,7 +57,7 @@ class GroundBlock {
 
       const leftBlock = scene.add.sprite(x, y, 'maps', frameName.left);
       blockList.push(leftBlock);
-      const rightBlock = scene.add.sprite(x, y, 'maps', frameName.right);
+      const rightBlock = scene.add.sprite(x + 64, y, 'maps', frameName.right);
       blockList.push(rightBlock);
 
       blockList.forEach(block => {

@@ -95,7 +95,7 @@ class MainScene extends Phaser.Scene {
         if (this.platform.children.entries.filter(block => (block as Phaser.Physics.Arcade.Sprite).y < this.currentGroundY).length === 0) {
           const randomX = blockCreateRondomX(this.playerX);
 
-          for (let i = 0; i < 2; i++) {
+          for (let i = 1; i <= 2; i++) {
             const randomY = Math.floor(Math.random() * (150 - 50 + 1)) + 50;
             const randomLength = Math.floor(Math.random() * (3 - 1 + 1)) + 1;
             const dir = randomX < this.playerX ? 'left' : 'right';

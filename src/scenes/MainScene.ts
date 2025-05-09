@@ -94,14 +94,15 @@ class MainScene extends Phaser.Scene {
 
         if (this.platform.children.entries.filter(block => (block as Phaser.Physics.Arcade.Sprite).y < this.currentGroundY).length === 0) {
           const randomX = blockCreateRondomX(this.playerX);
-          const randomY = Math.floor(Math.random() * (150 - 50 + 1)) + 50;
-          const randomLength = Math.floor(Math.random() * (3 - 1 + 1)) + 1;
-          const dir = randomX < this.playerX ? 'left' : 'right';
-          const dirAlt = randomX < this.playerX ? 'right' : 'left';
-          console.log(randomX);
-          console.log(randomY);
-          new GroundBlock(this, this.platform, randomX, this.currentGroundY - randomY, randomLength, dir);
-          new GroundBlock(this, this.platform, randomX * 2, this.currentGroundY - randomY, randomLength, dirAlt);
+
+          for (let i = 0; i < 2; i++) {
+            const randomY = Math.floor(Math.random() * (150 - 50 + 1)) + 50;
+            const randomLength = Math.floor(Math.random() * (3 - 1 + 1)) + 1;
+            const dir = randomX < this.playerX ? 'left' : 'right';
+            console.log(randomX);
+            console.log(randomY);
+            new GroundBlock(this, this.platform, randomX * i, this.currentGroundY - randomY, randomLength, dir);
+          }
         }
       }
     } else {

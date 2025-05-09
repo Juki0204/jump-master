@@ -126,7 +126,7 @@ function blockCreateRondomX(
   min = 0,
   max = 1280,
   excludeRange = 100,
-  limitRange = 200
+  limitRange = 160
 ): number {
   const leftMin = Math.max(min, playerX - limitRange);
   const leftMax = Math.max(min, playerX - excludeRange);

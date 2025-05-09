@@ -63,10 +63,10 @@ class MainScene extends Phaser.Scene {
     this.cameras.main.startFollow(this.player.sprite, true, 1, 1); //カメラの追従設定
 
     ////////////////////////// デバッグモード //////////////////////////
-    this.physics.world.createDebugGraphic();
-    this.physics.world.defaults.debugShowBody = true;
-    this.physics.world.defaults.debugShowVelocity = true;
-    this.physics.world.drawDebug = true;
+    // this.physics.world.createDebugGraphic();
+    // this.physics.world.defaults.debugShowBody = true;
+    // this.physics.world.defaults.debugShowVelocity = true;
+    // this.physics.world.drawDebug = true;
   }
 
   update() {

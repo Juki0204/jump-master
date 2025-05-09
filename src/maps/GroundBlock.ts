@@ -72,7 +72,7 @@ class GroundBlock {
         resultBlockList = blockList.reverse();
       }
 
-      blockList.forEach(block => {
+      resultBlockList.forEach(block => {
         scene.physics.add.existing(block, true);
         if (direction === 'right') {
           block.setOrigin(0, 0);
@@ -111,7 +111,7 @@ class GroundBlock {
         resultBlockList = blockList.reverse();
       }
 
-      blockList.forEach(block => {
+      resultBlockList.forEach(block => {
         scene.physics.add.existing(block, true);
         if (direction === 'right') {
           block.setOrigin(0, 0);

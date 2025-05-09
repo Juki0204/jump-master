@@ -55,7 +55,7 @@ class MainScene extends Phaser.Scene {
     Player.createAnims(this);
 
     this.player = new Player(this, 100, 3950);
-    this.physics.add.collider(this.player.sprite, this.platform, (playerObj, groundObj) => {
+    this.physics.add.collider(this.player.sprite, this.platform, (_playerObj, groundObj) => {
       this.currentGround = groundObj;
       this.currentGroundY = (groundObj as Phaser.Physics.Arcade.Sprite).y;
     });
@@ -108,7 +108,7 @@ class MainScene extends Phaser.Scene {
       this.logFlg = false;
     }
 
-    if ((this.player.sprite.body as Phaser.Physics.Arcade.Body).y - this.currentGroundY > 200) {
+    if (this.playerY && this.playerY - this.currentGroundY > 200) {
       // const cam = this.cameras.main;
       // this.cameras.main.stopFollow();
       // this.cameras.main.setScroll(this.playerX - cam.width / 2, this.playerY - cam.height / 2);

@@ -12,11 +12,35 @@ class MainScene extends Phaser.Scene {
   private currentGroundY: number = 4000;
   private logFlg = false;
   private playerX: number | null = null;
-  private playerY: number | null = null;
+  // private playerY: number | null = null;
 
   //ステージの広さ
   private mapWidth: number = 1280;
   private mapHeight: number = 4000;
+
+  // private destroyBlocksBelowCurrentGround(): void {
+  //   const destroyBlock = this.platform.children.entries.filter(block =>
+  //     (block as Phaser.Physics.Arcade.Sprite).y - 200 > this.currentGroundY &&
+  //     this.currentGroundY > 4000
+  //   );
+  //   console.log('今からブロック消えます');
+  //   console.log(destroyBlock);
+
+  //   destroyBlock.forEach(block => {
+  //     const sprite = block as Phaser.Physics.Arcade.Sprite;
+
+  //     this.tweens.add({
+  //       targets: sprite,
+  //       alpha: 0,
+  //       duration: 500,
+  //       ease: 'Cubic.easeIn',
+  //       onComplete: () => {
+  //         sprite.disableBody(true, true);
+  //         sprite.destroy();
+  //       }
+  //     });
+  //   });
+  // }
 
   constructor() {
     super({ key: 'MainScene' });
@@ -44,8 +68,8 @@ class MainScene extends Phaser.Scene {
     // this.platform.create(680, 3700, 'ground').setScale(0.3, 0.8).setOrigin(0.5, 1).refreshBody();
     // this.platform.create(1000, 3650, 'ground').setScale(0.2, 0.8).setOrigin(0.5, 1).refreshBody();
     // this.platform.create(1200, 3550, 'ground').setScale(0.2, 0.8).setOrigin(0.5, 1).refreshBody();
-    new GroundBlock(this, this.platform, 360, 3800, 3, 'right', 'grass');
-    new GroundBlock(this, this.platform, 640, 3650, 3, 'right', 'grass');
+    new GroundBlock(this, this.platform, 360, 3750, 3, 'right', 'grass');
+    new GroundBlock(this, this.platform, 640, 3550, 3, 'right', 'grass');
     // new GroundBlock(this, this.platform, 950, 3550, 2, 'grass');
     // new GroundBlock(this, this.platform, 1150, 3400, 2, 'grass');
 
@@ -72,10 +96,12 @@ class MainScene extends Phaser.Scene {
   update() {
     this.player.update(this.cursors, this.spaceKey);
 
+    //ESCキーでシーンリセット
     if (this.escKey.isDown) {
       this.scene.restart();
     }
 
+    //ランダム足場生成
     if ((this.player.sprite.body! as Phaser.Physics.Arcade.Body).onFloor()) {
       if (this.logFlg === false) {
         console.log('着地なう');
@@ -83,25 +109,49 @@ class MainScene extends Phaser.Scene {
         console.log('今接地している足場の高さは:', this.currentGroundY);
         this.logFlg = true;
         this.playerX = (this.player.sprite.body as Phaser.Physics.Arcade.Body).x;
-        this.playerY = (this.player.sprite.body as Phaser.Physics.Arcade.Body).y;
+        // this.playerY = (this.player.sprite.body as Phaser.Physics.Arcade.Body).y;
 
         console.log(this.platform.children.entries.filter(block => (block as Phaser.Physics.Arcade.Sprite).y === this.currentGroundY)); //今乗ってる足場
 
+        //自分の高さより200px以上下にある地面以外の足場の削除
         let destroyBlock = this.platform.children.entries.filter(block => (block as Phaser.Physics.Arcade.Sprite).y - 200 > this.currentGroundY);
+        console.log('今からブロック消えます');
+        console.log(destroyBlock);
         destroyBlock.forEach(block => {
-          block.destroy();
-        });
+          const sprite = block as Phaser.Physics.Arcade.Sprite;
 
-        if (this.platform.children.entries.filter(block => (block as Phaser.Physics.Arcade.Sprite).y < this.currentGroundY).length === 0) {
+          this.tweens.add({
+            targets: sprite,
+            alpha: { from: 1, to: 0 },
+            duration: 500,
+            // delay: 300,
+            ease: 'Cubic.easeIn',
+            onComplete: () => {
+              block.destroy();
+            }
+          });
+        });
+        // this.destroyBlocksBelowCurrentGround();
+
+        let currentMoreBlock = this.platform.children.entries.filter(block => (block as Phaser.Physics.Arcade.Sprite).y <= this.currentGroundY);
+        let currentMoreBlockY = currentMoreBlock.map(obj => (obj as Phaser.Physics.Arcade.Sprite).y);
+        let currentMoreBlockCount = new Set(currentMoreBlockY).size
+        console.log(currentMoreBlockCount);
+
+        if (currentMoreBlockCount <= 2 && this.currentGroundY < 3600) {
           const randomX = blockCreateRondomX(this.playerX);
+          console.log(randomX);
 
           for (let i = 1; i <= 2; i++) {
-            const randomY = Math.floor(Math.random() * (150 - 50 + 1)) + 50;
+            const randomY = Math.floor(Math.random() * (240 - 100 + 1)) + 100;
             const randomLength = Math.floor(Math.random() * (3 - 1 + 1)) + 1;
-            const dir = randomX < this.playerX ? 'left' : 'right';
-            console.log(randomX);
+            // const dir = randomX < this.playerX ? 'left' : 'right';
             console.log(randomY);
-            new GroundBlock(this, this.platform, randomX * i, this.currentGroundY - randomY, randomLength, dir);
+            if (i === 1) {
+              new GroundBlock(this, this.platform, randomX[0], this.currentGroundY - randomY, randomLength, 'left');
+            } else {
+              new GroundBlock(this, this.platform, randomX[1], this.currentGroundY - randomY, randomLength, 'right');
+            }
           }
         }
       }
@@ -109,14 +159,12 @@ class MainScene extends Phaser.Scene {
       this.logFlg = false;
     }
 
-    if (this.playerY && this.playerY - this.currentGroundY > 200) {
-      // const cam = this.cameras.main;
-      // this.cameras.main.stopFollow();
-      // this.cameras.main.setScroll(this.playerX - cam.width / 2, this.playerY - cam.height / 2);
-
-      this.scene.pause();
-      const gameoverTxt = this.add.text(this.cameras.main.width / 2, this.cameras.main.height / 2, 'GAME OVER', { fontSize: 24, fontStyle: 'bold' }).setOrigin(0.5, 0.5);
+    //ゲームオーバー処理
+    if ((this.player.sprite.body as Phaser.Physics.Arcade.Body).y && (this.player.sprite.body as Phaser.Physics.Arcade.Body).y - this.currentGroundY > 300) {
+      this.add.rectangle(0, 0, this.mapWidth, this.mapHeight, 0x000000, 0.8).setDepth(10).setOrigin(0, 0);
+      const gameoverTxt = this.add.text(this.cameras.main.width / 2, this.cameras.main.height / 2, 'GAME OVER', { fontSize: 40, fontStyle: 'bold' }).setOrigin(0.5, 0.5).setDepth(10);
       gameoverTxt.setScrollFactor(0);
+      this.scene.pause();
     }
   }
 }
@@ -125,9 +173,9 @@ function blockCreateRondomX(
   playerX: number,
   min = 0,
   max = 1280,
-  excludeRange = 100,
-  limitRange = 160
-): number {
+  excludeRange = 200,
+  limitRange = 290
+): number[] {
   const leftMin = Math.max(min, playerX - limitRange);
   const leftMax = Math.max(min, playerX - excludeRange);
 
@@ -137,20 +185,22 @@ function blockCreateRondomX(
   const leftWidth = leftMax - leftMin;
   const rightWidth = rightMax - rightMin;
 
-  if (leftWidth <= 0 && rightWidth <= 0) {
-    console.warn('有効なX座標の範囲がありません');
-    return playerX;
-  }
+  // if (leftWidth <= 0 && rightWidth <= 0) {
+  //   console.warn('有効なX座標の範囲がありません');
+  //   return playerX;
+  // }
 
   // どちら側を使うかを、範囲の広さに応じてランダムに選択（偏りを避ける）
-  const totalWidth = leftWidth + rightWidth;
-  const rand = Math.random() * totalWidth;
+  // const totalWidth = leftWidth + rightWidth;
+  // const rand = Math.random() * totalWidth;
 
-  if (rand < leftWidth) {
-    return Math.floor(Math.random() * leftWidth) + leftMin;
-  } else {
-    return Math.floor(Math.random() * rightWidth) + rightMin;
-  }
+  // if (rand < leftWidth) {
+  //   return Math.floor(Math.random() * leftWidth) + leftMin;
+  // } else {
+  //   return Math.floor(Math.random() * rightWidth) + rightMin;
+  // }
+
+  return [Math.floor(Math.random() * leftWidth) + leftMin, Math.floor(Math.random() * rightWidth) + rightMin];
 }
 
 export default MainScene;

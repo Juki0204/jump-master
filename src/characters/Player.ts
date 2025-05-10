@@ -7,7 +7,7 @@ class Player {
   private isJump: boolean = false;
   private wasOnGround: boolean = true;
   private standardOffsetX: number = 0;
-  private jumpVelocity: number = -800;
+  private jumpVelocity: number = -1000;
 
   constructor(scene: Phaser.Scene, x: number, y: number) {
     this.scene = scene;

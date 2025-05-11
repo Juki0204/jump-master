@@ -44,11 +44,11 @@ class MainScene extends Phaser.Scene {
 
     //地面の生成
     for (let x = 0; x < this.mapWidth; x += 64) {
-      this.platform.create(x, this.mapHeight, 'maps', 'terrain_grass_block_top').setScale(1, 1).setOrigin(0, 1).refreshBody();
+      this.platform.create(x, this.mapHeight, 'maps', 'terrain_stone_block_top').setScale(1, 1).setOrigin(0, 1).refreshBody();
     }
 
-    new GroundBlock(this, this.platform, 360, this.mapHeight - 250, 3, 'right', 'grass');
-    new GroundBlock(this, this.platform, 640, this.mapHeight - 450, 3, 'right', 'grass');
+    new GroundBlock(this, this.platform, 360, this.mapHeight - 250, 3, 'right', 'stone');
+    new GroundBlock(this, this.platform, 640, this.mapHeight - 450, 3, 'right', 'stone');
 
     this.cameras.main.setBounds(0, 0, this.mapWidth, this.mapHeight); //カメラの移動範囲
     this.physics.world.setBounds(0, 0, this.mapWidth, this.mapHeight); //物理演算の範囲
@@ -127,9 +127,9 @@ class MainScene extends Phaser.Scene {
 
             //着地点から見て左右に1つずつ生成する
             if (i === 1) {
-              new GroundBlock(this, this.platform, randomX[0], this.currentGroundY - randomY, randomLength, 'left');
+              new GroundBlock(this, this.platform, randomX[0], this.currentGroundY - randomY, randomLength, 'left', 'stone');
             } else {
-              new GroundBlock(this, this.platform, randomX[1], this.currentGroundY - randomY, randomLength, 'right');
+              new GroundBlock(this, this.platform, randomX[1], this.currentGroundY - randomY, randomLength, 'right', 'stone');
             }
           }
         }
@@ -153,6 +153,7 @@ class MainScene extends Phaser.Scene {
   }
 }
 
+//足場生成
 function blockCreateRondomX(
   playerX: number,
   min = 0,

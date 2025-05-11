@@ -82,14 +82,6 @@ class GroundBlock {
         (block.body! as Phaser.Physics.Arcade.Body).updateFromGameObject();
         group.add(block);
       });
-      // scene.physics.add.existing(leftBlock, true);
-      // scene.physics.add.existing(rightBlock, true);
-      // leftBlock.setOrigin(0, 0);
-      // rightBlock.setOrigin(0, 0);
-      // (leftBlock.body! as Phaser.Physics.Arcade.Body).updateFromGameObject();
-      // (rightBlock.body! as Phaser.Physics.Arcade.Body).updateFromGameObject();
-      // group.add(leftBlock);
-      // group.add(leftBlock);
 
     } else { //長さ3以上のブロック
       const blockList = [];

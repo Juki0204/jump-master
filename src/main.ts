@@ -1,11 +1,23 @@
 import Phaser from "phaser";
 import MainScene from "./scenes/MainScene";
 
+function getResponsiveSize() {
+  const breakpoint = 768;
+  const isMobile = window.innerWidth < breakpoint;
+
+  const width = isMobile ? window.innerWidth : 1280;
+  const height = isMobile ? window.innerHeight : 800;
+
+  return { width, height };
+}
+
+const { width, height } = getResponsiveSize();
+
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.WEBGL,
   parent: 'app',
-  width: 1280,
-  height: 800,
+  width,
+  height,
   backgroundColor: '#2d2d2d',
   physics: { //物理演算
     default: 'arcade', //使用する物理エンジンの指定

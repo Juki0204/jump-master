@@ -7,15 +7,18 @@ class Player {
   private isJump: boolean = false;
   private wasOnGround: boolean = true;
   private standardOffsetX: number = 0;
-  private jumpVelocity: number = -1000;
+  private jumpVelocity: number = -900;
 
   constructor(scene: Phaser.Scene, x: number, y: number) {
     this.scene = scene;
 
+    const objectScale = window.innerWidth < 768 ? 0.4 : 0.5;
+
     this.sprite = this.scene.physics.add.sprite(x, y, 'jump_00');
     this.sprite.setCollideWorldBounds(true);
-    this.sprite.setScale(0.5);
+    this.sprite.setScale(0.4);
     this.sprite.setOrigin(0.5, 1);
+    this.sprite.setScale(objectScale);
     this.sprite!.body!.setSize(this.sprite.width * 0.16, this.sprite.height * 0.78);
     this.sprite!.body!.setOffset(this.sprite.width / 2, this.sprite.height * 0.18);
     this.sprite.play('idle');

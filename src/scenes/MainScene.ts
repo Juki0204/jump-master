@@ -10,16 +10,19 @@ class MainScene extends Phaser.Scene {
   private platform!: Phaser.Physics.Arcade.StaticGroup;
   private currentGroundY: number = 4000;
   private logFlg = false;
-  private playerX: number | null = null;
+  // private playerX: number | null = null;
   // private playerY: number | null = null;
 
   //ステージの広さ
   private mapWidth: number = 1280;
   private mapHeight: number = 4000;
 
+  private objectScale: number = window.innerWidth < 768 ? 0.75 : 1;
+
   //UI
   private score: number = this.mapHeight - this.currentGroundY;
   private uiScore!: Phaser.GameObjects.Text;
+
 
   constructor() {
     super({ key: 'MainScene' });
@@ -43,12 +46,12 @@ class MainScene extends Phaser.Scene {
     this.platform = this.physics.add.staticGroup();
 
     //地面の生成
-    for (let x = 0; x < this.mapWidth; x += 64) {
-      this.platform.create(x, this.mapHeight, 'maps', 'terrain_stone_block_top').setScale(1, 1).setOrigin(0, 1).refreshBody();
+    for (let x = 0; x * this.objectScale < this.mapWidth; x += 64) {
+      this.platform.create(x * this.objectScale, this.mapHeight, 'maps', 'terrain_stone_block_top').setScale(this.objectScale).setOrigin(0, 1).refreshBody();
     }
 
-    new GroundBlock(this, this.platform, 360, this.mapHeight - 250, 3, 'right', 'stone');
-    new GroundBlock(this, this.platform, 640, this.mapHeight - 450, 3, 'right', 'stone');
+    new GroundBlock(this, this.platform, 360, this.mapHeight - 220, 3, 'right', 'stone');
+    new GroundBlock(this, this.platform, 640, this.mapHeight - 410, 3, 'right', 'stone');
 
     this.cameras.main.setBounds(0, 0, this.mapWidth, this.mapHeight); //カメラの移動範囲
     this.physics.world.setBounds(0, 0, this.mapWidth, this.mapHeight); //物理演算の範囲
@@ -83,10 +86,10 @@ class MainScene extends Phaser.Scene {
         // console.log('着地なう');
         console.log('今接地している足場の高さは:', this.currentGroundY);
         this.logFlg = true;
-        this.playerX = (this.player.sprite.body as Phaser.Physics.Arcade.Body).x;
+        // this.playerX = (this.player.sprite.body as Phaser.Physics.Arcade.Body).x;
         // this.playerY = (this.player.sprite.body as Phaser.Physics.Arcade.Body).y;
 
-        console.log(this.platform.children.entries.filter(block => (block as Phaser.Physics.Arcade.Sprite).y === this.currentGroundY)); //今乗ってる足場
+        //console.log(this.platform.children.entries.filter(block => (block as Phaser.Physics.Arcade.Sprite).y === this.currentGroundY)); //今乗ってる足場
 
         //自分の着地した足場より200px以上下にある足場の削除（最下層の地面は除外
         let destroyBlock = this.platform.children.entries.filter(block => (block as Phaser.Physics.Arcade.Sprite).y - 200 > this.currentGroundY && (block as Phaser.Physics.Arcade.Sprite).y < this.mapHeight);
@@ -113,15 +116,24 @@ class MainScene extends Phaser.Scene {
         let currentMoreBlock = this.platform.children.entries.filter(block => (block as Phaser.Physics.Arcade.Sprite).y <= this.currentGroundY);
         let currentMoreBlockY = currentMoreBlock.map(obj => (obj as Phaser.Physics.Arcade.Sprite).y);
         let currentMoreBlockCount = new Set(currentMoreBlockY).size
-        console.log(currentMoreBlockCount);
+        // console.log(currentMoreBlock);
 
         //現在の足場と同時に生成された足場のどちらかに乗った時点で次の足場を生成する（地面と初期生成のブロックは除外）
         if (currentMoreBlockCount <= 2 && this.currentGroundY < this.mapHeight - 400) {
-          const randomX = blockCreateRondomX(this.playerX);
+          const currentBlock = this.platform.children.entries.filter(block => (block as Phaser.Physics.Arcade.Sprite).y === this.currentGroundY);
+
+          console.log(
+            (currentBlock[0] as Phaser.Physics.Arcade.Sprite).x,
+            (currentBlock[currentBlock.length - 1] as Phaser.Physics.Arcade.Sprite).x + (currentBlock[currentBlock.length - 1] as Phaser.Physics.Arcade.Sprite).body!.width
+          );
+
+          const leftEndPoint = (currentBlock[0] as Phaser.Physics.Arcade.Sprite).body!.x;
+          const rightEndPoint = (currentBlock[currentBlock.length - 1] as Phaser.Physics.Arcade.Sprite).x + (currentBlock[currentBlock.length - 1] as Phaser.Physics.Arcade.Sprite).body!.width;
+          const randomX = blockCreateRondomX2(leftEndPoint, rightEndPoint);
           console.log(randomX);
 
           for (let i = 1; i <= 2; i++) {
-            const randomY = Math.floor(Math.random() * (240 - 100 + 1)) + 100; //恐らくジャンプで届く最大高度
+            const randomY = Math.floor(Math.random() * (190 - 100 + 1)) + 100; //恐らくジャンプで届く最大高度
             const randomLength = Math.floor(Math.random() * (3 - 1 + 1)) + 1;
             console.log(randomY);
 
@@ -154,18 +166,39 @@ class MainScene extends Phaser.Scene {
 }
 
 //足場生成
-function blockCreateRondomX(
-  playerX: number,
+// function blockCreateRondomX(
+//   playerX: number,
+//   min = 0,
+//   max = 1280,
+//   excludeRange = 150,
+//   limitRange = 200 //恐らくジャンプで届く最大距離
+// ): number[] {
+//   const leftMin = Math.max(min, playerX - limitRange);
+//   const leftMax = Math.max(min, playerX - excludeRange);
+
+//   const rightMin = Math.min(max, playerX + excludeRange);
+//   const rightMax = Math.min(max, playerX + limitRange);
+
+//   const leftWidth = leftMax - leftMin;
+//   const rightWidth = rightMax - rightMin;
+
+//   //自分の着地位置から左右に1か所ずつ足場生成用のX座標を生成
+//   return [Math.floor(Math.random() * leftWidth) + leftMin, Math.floor(Math.random() * rightWidth) + rightMin];
+// }
+
+function blockCreateRondomX2(
+  leftPoint: number,
+  rightPoint: number,
   min = 0,
   max = 1280,
-  excludeRange = 200,
-  limitRange = 290 //恐らくジャンプで届く最大距離
+  excludeRange = 0,
+  limitRange = 170 //恐らくジャンプで届く最大距離
 ): number[] {
-  const leftMin = Math.max(min, playerX - limitRange);
-  const leftMax = Math.max(min, playerX - excludeRange);
+  const leftMin = Math.max(min, leftPoint - limitRange);
+  const leftMax = Math.max(min, leftPoint - excludeRange);
 
-  const rightMin = Math.min(max, playerX + excludeRange);
-  const rightMax = Math.min(max, playerX + limitRange);
+  const rightMin = Math.min(max, rightPoint + excludeRange);
+  const rightMax = Math.min(max, rightPoint + limitRange);
 
   const leftWidth = leftMax - leftMin;
   const rightWidth = rightMax - rightMin;

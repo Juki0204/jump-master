@@ -44,7 +44,7 @@ class GroundBlock {
     }
 
     const frameName = frameMap[type] || frameMap['grass'];
-    const objectScale = window.innerWidth < 768 ? 0.75 : 1;
+    const objectScale = window.innerWidth < 768 ? 0.4 : 0.6;
 
     const sideBlock1 = direction === 'right' ? frameName.right : frameName.left;
     const sideBlock2 = direction === 'right' ? frameName.left : frameName.right;

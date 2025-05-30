@@ -12,11 +12,11 @@ class Player {
   constructor(scene: Phaser.Scene, x: number, y: number) {
     this.scene = scene;
 
-    const objectScale = window.innerWidth < 768 ? 0.4 : 0.5;
+    const objectScale = window.innerWidth < 768 ? 0.6 : 0.8;
 
     this.sprite = this.scene.physics.add.sprite(x, y, 'jump_00');
     this.sprite.setCollideWorldBounds(true);
-    this.sprite.setScale(0.4);
+    // this.sprite.setScale(0.4);
     this.sprite.setOrigin(0.5, 1);
     this.sprite.setScale(objectScale);
     this.sprite!.body!.setSize(this.sprite.width * 0.16, this.sprite.height * 0.78);
@@ -25,20 +25,37 @@ class Player {
   }
 
   //画像データ読み込み
+  // static preload(scene: Phaser.Scene) {
+  //   for (let i = 0; i < 69; i++) {
+  //     const frameKey = `idle_${i.toString().padStart(2, '0')}`;
+  //     scene.load.image(frameKey, `assets/player_idle/Armature_${frameKey}.png`);
+  //   }
+
+  //   for (let i = 0; i < 25; i++) {
+  //     const frameKey = `run_${i.toString().padStart(2, '0')}`;
+  //     scene.load.image(frameKey, `assets/player_run/Armature_${frameKey}.png`);
+  //   }
+
+  //   for (let i = 0; i < 30; i++) {
+  //     const frameKey = `jump_${i.toString().padStart(2, '0')}`;
+  //     scene.load.image(frameKey, `assets/player_jump2/Armature_${frameKey}.png`);
+  //   }
+  // }
+
   static preload(scene: Phaser.Scene) {
-    for (let i = 0; i < 69; i++) {
+    for (let i = 0; i < 35; i++) {
       const frameKey = `idle_${i.toString().padStart(2, '0')}`;
-      scene.load.image(frameKey, `assets/player_idle/Armature_${frameKey}.png`);
+      scene.load.image(frameKey, `assets/dot_idle/Armature_${frameKey}.png`);
     }
 
-    for (let i = 0; i < 25; i++) {
+    for (let i = 0; i < 13; i++) {
       const frameKey = `run_${i.toString().padStart(2, '0')}`;
-      scene.load.image(frameKey, `assets/player_run/Armature_${frameKey}.png`);
+      scene.load.image(frameKey, `assets/dot_run/Armature_${frameKey}.png`);
     }
 
-    for (let i = 0; i < 30; i++) {
+    for (let i = 0; i < 15; i++) {
       const frameKey = `jump_${i.toString().padStart(2, '0')}`;
-      scene.load.image(frameKey, `assets/player_jump2/Armature_${frameKey}.png`);
+      scene.load.image(frameKey, `assets/dot_jump/Armature_${frameKey}.png`);
     }
   }
 
@@ -46,34 +63,34 @@ class Player {
   static createAnims(scene: Phaser.Scene) {
     scene.anims.create({
       key: 'idle',
-      frames: Array.from({ length: 69 }, (_, i) => ({
+      frames: Array.from({ length: 35 }, (_, i) => ({
         key: `idle_${i.toString().padStart(2, '0')}`
+      })),
+      frameRate: 8,
+      repeat: -1,
+    });
+
+    scene.anims.create({
+      key: 'run',
+      frames: Array.from({ length: 13 }, (_, i) => ({
+        key: `run_${i.toString().padStart(2, '0')}`
       })),
       frameRate: 16,
       repeat: -1,
     });
 
     scene.anims.create({
-      key: 'run',
-      frames: Array.from({ length: 25 }, (_, i) => ({
-        key: `run_${i.toString().padStart(2, '0')}`
-      })),
-      frameRate: 32,
-      repeat: -1,
-    });
-
-    scene.anims.create({
       key: 'jump',
-      frames: Array.from({ length: 24 }, (_, i) => ({
-        key: `jump_${(6 + i).toString().padStart(2, '0')}`
+      frames: Array.from({ length: 12 }, (_, i) => ({
+        key: `jump_${(3 + i).toString().padStart(2, '0')}`
       })).concat([
-        { key: 'jump_28' },
-        { key: 'jump_28' },
-        { key: 'jump_29' },
-        { key: 'jump_29' },
-        { key: 'jump_29' }
+        { key: 'jump_13' },
+        { key: 'jump_13' },
+        { key: 'jump_14' },
+        { key: 'jump_14' },
+        { key: 'jump_14' }
       ]),
-      frameRate: 22,
+      frameRate: 11,
       repeat: 0,
     });
   }
@@ -85,11 +102,11 @@ class Player {
     if (this.direction === 'right') {
       this.standardOffsetX = this.sprite.width / 2;
     } else {
-      this.standardOffsetX = this.sprite.width / 2 - 65;
+      this.standardOffsetX = this.sprite.width / 2 - 35;
     }
 
     if (cursors.left.isDown) {
-      this.sprite.setVelocityX(-300);
+      this.sprite.setVelocityX(-200);
       this.sprite.setFlipX(true);
       this.sprite!.body!.setOffset(this.standardOffsetX, this.sprite.height * 0.18);
       if (!this.isJump && onGround) {
@@ -97,7 +114,7 @@ class Player {
       }
       this.direction = 'left';
     } else if (cursors.right.isDown) {
-      this.sprite.setVelocityX(300);
+      this.sprite.setVelocityX(200);
       this.sprite.setFlipX(false);
       this.sprite!.body!.setOffset(this.standardOffsetX, this.sprite.height * 0.18);
       if (!this.isJump && onGround) {

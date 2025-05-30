@@ -17,7 +17,7 @@ class MainScene extends Phaser.Scene {
   private mapWidth: number = 1280;
   private mapHeight: number = 4000;
 
-  private objectScale: number = window.innerWidth < 768 ? 0.75 : 1;
+  private objectScale: number = window.innerWidth < 768 ? 0.4 : 0.6;
 
   //UI
   private score: number = this.mapHeight - this.currentGroundY;
@@ -31,7 +31,7 @@ class MainScene extends Phaser.Scene {
   preload() {
     Player.preload(this);
     this.load.image('ground', 'assets/platform.png');
-    this.load.atlas('maps', 'assets/maps/spritesheet.png', 'assets/maps/spritesheet.json');
+    this.load.atlas('maps', 'assets/maps/spritesheet_dot.png', 'assets/maps/spritesheet.json');
   }
 
   create() {
@@ -50,8 +50,8 @@ class MainScene extends Phaser.Scene {
       this.platform.create(x * this.objectScale, this.mapHeight, 'maps', 'terrain_stone_block_top').setScale(this.objectScale).setOrigin(0, 1).refreshBody();
     }
 
-    new GroundBlock(this, this.platform, 360, this.mapHeight - 220, 3, 'right', 'stone');
-    new GroundBlock(this, this.platform, 640, this.mapHeight - 410, 3, 'right', 'stone');
+    new GroundBlock(this, this.platform, 360, this.mapHeight - 200, 3, 'right', 'stone');
+    new GroundBlock(this, this.platform, 540, this.mapHeight - 300, 3, 'right', 'stone');
 
     this.cameras.main.setBounds(0, 0, this.mapWidth, this.mapHeight); //カメラの移動範囲
     this.physics.world.setBounds(0, 0, this.mapWidth, this.mapHeight); //物理演算の範囲
@@ -66,10 +66,10 @@ class MainScene extends Phaser.Scene {
     this.cameras.main.startFollow(this.player.sprite, true, 1, 1); //カメラの追従設定
 
     ////////////////////////// デバッグモード //////////////////////////
-    // this.physics.world.createDebugGraphic();
-    // this.physics.world.defaults.debugShowBody = true;
-    // this.physics.world.defaults.debugShowVelocity = true;
-    // this.physics.world.drawDebug = true;
+    this.physics.world.createDebugGraphic();
+    this.physics.world.defaults.debugShowBody = true;
+    this.physics.world.defaults.debugShowVelocity = true;
+    this.physics.world.drawDebug = true;
   }
 
   update() {
@@ -117,9 +117,10 @@ class MainScene extends Phaser.Scene {
         let currentMoreBlockY = currentMoreBlock.map(obj => (obj as Phaser.Physics.Arcade.Sprite).y);
         let currentMoreBlockCount = new Set(currentMoreBlockY).size
         // console.log(currentMoreBlock);
+        console.log(currentMoreBlockCount, this.currentGroundY, this.mapHeight - 290);
 
         //現在の足場と同時に生成された足場のどちらかに乗った時点で次の足場を生成する（地面と初期生成のブロックは除外）
-        if (currentMoreBlockCount <= 2 && this.currentGroundY < this.mapHeight - 400) {
+        if (currentMoreBlockCount <= 2 && this.currentGroundY < this.mapHeight - 290) {
           const currentBlock = this.platform.children.entries.filter(block => (block as Phaser.Physics.Arcade.Sprite).y === this.currentGroundY);
 
           console.log(
@@ -154,14 +155,14 @@ class MainScene extends Phaser.Scene {
     if ((this.player.sprite.body as Phaser.Physics.Arcade.Body).y && (this.player.sprite.body as Phaser.Physics.Arcade.Body).y - this.currentGroundY > 300) {
       this.add.rectangle(0, 0, this.mapWidth, this.mapHeight, 0x000000, 0.8).setDepth(10).setOrigin(0, 0);
       const gameoverTxt = this.add.text(this.cameras.main.width / 2, this.cameras.main.height / 2, 'GAME OVER', { fontSize: 64, fontStyle: 'bold' }).setOrigin(0.5, 0.5).setDepth(10);
-      const gameoverScore = this.add.text(this.cameras.main.width / 2, this.cameras.main.height / 2 + 60, `今回のスコア：${this.score}m`, { fontSize: 32, fontStyle: 'bold', padding: { x: 10, y: 10 } }).setOrigin(0.5, 0.5).setDepth(10);
+      const gameoverScore = this.add.text(this.cameras.main.width / 2, this.cameras.main.height / 2 + 60, `今回のスコア：${this.score / 100}m`, { fontSize: 32, fontStyle: 'bold', padding: { x: 10, y: 10 } }).setOrigin(0.5, 0.5).setDepth(10);
       gameoverTxt.setScrollFactor(0);
       gameoverScore.setScrollFactor(0);
       this.scene.pause();
     }
 
     this.score = this.mapHeight - this.currentGroundY;
-    this.uiScore.setText(`登った高さ:${this.score}m`);
+    this.uiScore.setText(`登った高さ:${this.score / 100}m`);
   }
 }
 
@@ -192,7 +193,7 @@ function blockCreateRondomX2(
   min = 0,
   max = 1280,
   excludeRange = 0,
-  limitRange = 170 //恐らくジャンプで届く最大距離
+  limitRange = 140 //恐らくジャンプで届く最大距離
 ): number[] {
   const leftMin = Math.max(min, leftPoint - limitRange);
   const leftMax = Math.max(min, leftPoint - excludeRange);

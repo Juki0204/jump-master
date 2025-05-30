@@ -58,7 +58,7 @@ class MainScene extends Phaser.Scene {
 
     Player.createAnims(this);
 
-    this.player = new Player(this, 100, this.mapHeight - 50);
+    this.player = new Player(this, 500, this.mapHeight - 50);
     this.physics.add.collider(this.player.sprite, this.platform, (_playerObj, groundObj) => {
       this.currentGroundY = (groundObj as Phaser.Physics.Arcade.Sprite).y;
     });
@@ -134,7 +134,7 @@ class MainScene extends Phaser.Scene {
           console.log(randomX);
 
           for (let i = 1; i <= 2; i++) {
-            const randomY = Math.floor(Math.random() * (190 - 100 + 1)) + 100; //恐らくジャンプで届く最大高度
+            const randomY = Math.floor(Math.random() * (180 - 80 + 1)) + 80; //恐らくジャンプで届く最大高度
             const randomLength = Math.floor(Math.random() * (3 - 1 + 1)) + 1;
             console.log(randomY);
 

@@ -9,6 +9,11 @@ class Player {
   private standardOffsetX: number = 0;
   private jumpVelocity: number = -900;
 
+  private touchStartX: number | null = null;
+  private touchStartY: number | null = null;
+  private airMoveVelocityX: number = 0;
+  private flickFlg: boolean = false;
+
   constructor(scene: Phaser.Scene, x: number, y: number) {
     this.scene = scene;
 
@@ -22,6 +27,71 @@ class Player {
     this.sprite!.body!.setSize(this.sprite.width * 0.16, this.sprite.height * 0.78);
     this.sprite!.body!.setOffset(this.sprite.width / 2, this.sprite.height * 0.18);
     this.sprite.play('idle');
+
+    //引っ張りアクション用
+    this.scene.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+      this.touchStartX = pointer.x;
+      this.touchStartY = pointer.y;
+      this.flickFlg = true;
+      console.log(this.touchStartX, this.touchStartY);
+    });
+
+    this.scene.input.on('pointerup', (pointer: Phaser.Input.Pointer) => {
+      const onGround = (this.sprite.body as Phaser.Physics.Arcade.Body).onFloor();
+      if (!onGround || this.isJump || this.touchStartX === null || this.touchStartY === null) return;
+
+      const dragX = this.touchStartX - pointer.x;
+      const dragY = Math.abs(this.touchStartY - pointer.y);
+      const dragDistance = Math.sqrt(dragX ** 2 + dragY ** 2);
+      const threshold = 30;
+
+      if (dragDistance < threshold) return;
+
+      const directionX = dragX / dragDistance;
+      const directionY = dragY / dragDistance;
+
+      // 距離に応じたジャンプパワー（最大900）
+      const jumpPower = Phaser.Math.Clamp(dragDistance * 10, 300, 900);
+
+      const angleRad = Math.atan2(-directionY, directionX);
+      const angleDeg = Phaser.Math.RadToDeg(angleRad);
+      const absAngleFromHorizontal = angleDeg;
+
+      console.log(absAngleFromHorizontal);
+      // 反対方向にジャンプ（マイナスをつける）
+      const velocityX = directionX * jumpPower * 0.7; // 横方向は調整して抑えめに
+      const velocityY = -directionY * jumpPower;
+
+      if (absAngleFromHorizontal > -90) {
+        this.direction = 'right';
+        this.sprite.setFlipX(false);
+        this.standardOffsetX = this.sprite.width / 2;
+      } else {
+        this.direction = 'left';
+        this.sprite.setFlipX(true);
+        this.standardOffsetX = this.sprite.width / 2 - 35;
+      }
+
+      // if (-150 < absAngleFromHorizontal && absAngleFromHorizontal < -30) {
+      this.isJump = true;
+      this.airMoveVelocityX = velocityX;
+      this.sprite.setVelocityY(velocityY);
+
+      this.sprite.anims.play('jump').once('animationcomplete', () => {
+        if (this.isJump) {
+          this.isJump = false;
+          this.sprite.anims.play('idle', true);
+        }
+      });
+      // } else {
+      //   return;
+      // }
+
+      this.touchStartX = null;
+      this.touchStartY = null;
+
+      console.log(this.standardOffsetX);
+    });
   }
 
   //画像データ読み込み
@@ -96,7 +166,10 @@ class Player {
   }
 
   //操作アクション
-  update(cursors: Phaser.Types.Input.Keyboard.CursorKeys, spaceKey: Phaser.Input.Keyboard.Key) {
+  update(
+    cursors: Phaser.Types.Input.Keyboard.CursorKeys,
+    spaceKey: Phaser.Input.Keyboard.Key
+  ) {
     const onGround = (this.sprite.body as Phaser.Physics.Arcade.Body).onFloor();
 
     if (this.direction === 'right') {
@@ -146,6 +219,19 @@ class Player {
     }
 
     this.wasOnGround = onGround;
+
+    if (this.flickFlg && !onGround && this.isJump) {
+      this.sprite.setVelocityX(this.airMoveVelocityX);
+      this.sprite!.body!.setOffset(this.standardOffsetX, this.sprite.height * 0.18);
+    }
+
+    if (this.flickFlg && onGround && !this.wasOnGround) {
+      this.sprite.anims.play('idle');
+      this.sprite!.body!.setOffset(this.standardOffsetX, this.sprite.height * 0.18);
+      this.isJump = false;
+      this.airMoveVelocityX = 0;
+      this.flickFlg = false;
+    }
   }
 }
 

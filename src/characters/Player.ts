@@ -19,7 +19,7 @@ class Player {
 
     const objectScale = window.innerWidth < 768 ? 0.6 : 0.8;
 
-    this.sprite = this.scene.physics.add.sprite(x, y, 'jump_00');
+    this.sprite = this.scene.physics.add.sprite(x, y, 'idle_00');
     this.sprite.setCollideWorldBounds(true);
     // this.sprite.setScale(0.4);
     this.sprite.setOrigin(0.5, 1);
@@ -43,7 +43,7 @@ class Player {
       const dragX = this.touchStartX - pointer.x;
       const dragY = Math.abs(this.touchStartY - pointer.y);
       const dragDistance = Math.sqrt(dragX ** 2 + dragY ** 2);
-      const threshold = 30;
+      const threshold = 1;
 
       if (dragDistance < threshold) return;
 

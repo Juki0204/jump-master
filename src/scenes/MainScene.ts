@@ -135,7 +135,7 @@ class MainScene extends Phaser.Scene {
 
           for (let i = 1; i <= 2; i++) {
             const randomY = Math.floor(Math.random() * (180 - 80 + 1)) + 80; //恐らくジャンプで届く最大高度
-            const randomLength = Math.floor(Math.random() * (3 - 1 + 1)) + 1;
+            const randomLength = Math.floor(Math.random() * (4 - 2 + 1)) + 2;
             console.log(randomY);
 
             //着地点から見て左右に1つずつ生成する

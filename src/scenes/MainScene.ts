@@ -30,7 +30,13 @@ class MainScene extends Phaser.Scene {
 
   preload() {
     Player.preload(this);
-    this.load.image('ground', 'assets/platform.png');
+    // this.load.image('ground', 'assets/platform.png');
+    this.load.image('cloud1', 'assets/maps/cloud1.png');
+    this.load.image('cloud2', 'assets/maps/cloud2.png');
+    this.load.image('cloud3', 'assets/maps/cloud3.png');
+    this.load.image('cloud4', 'assets/maps/cloud4.png');
+    this.load.image('sky', 'assets/maps/sky.png');
+    this.load.image('ground', 'assets/maps/ground.png');
     this.load.atlas('maps', 'assets/maps/spritesheet_dot.png', 'assets/maps/spritesheet.json');
   }
 
@@ -40,18 +46,36 @@ class MainScene extends Phaser.Scene {
     this.escKey = this.input!.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
 
     //UI
-    this.uiScore = this.add.text(10, 10, `登った高さ:${this.score}m`, { fontSize: 32, fontStyle: 'bold', padding: { x: 10, y: 10 } }).setOrigin(0, 0);
+    this.uiScore = this.add.text(10, 10, `登った高さ:${this.score}m`, { fontSize: 32, fontStyle: 'bold', padding: { x: 10, y: 10 } }).setOrigin(0, 0).setDepth(10);
     this.uiScore.setScrollFactor(0);
+
+    //背景の生成
+    this.add.image(0, 0, 'sky').setOrigin(0, 0);
+    this.add.image(this.mapWidth / 2, this.mapHeight - 40, 'cloud4').setOrigin(0.5, 1);
+    this.add.image(0, this.mapHeight, 'ground').setOrigin(0, 1);
+
+    this.add.image(-40, this.mapHeight - 500, 'cloud1').setOrigin(0, 1).setScale(0.5);
+    this.add.image(266, this.mapHeight - 800, 'cloud2').setOrigin(0, 1).setScale(0.5);
+    this.add.image(900, this.mapHeight - 930, 'cloud3').setOrigin(0, 1).setScale(0.5);
+    this.add.image(-260, this.mapHeight - 1340, 'cloud3').setOrigin(0, 1).setScale(0.5);
+    this.add.image(640, this.mapHeight - 1400, 'cloud1').setOrigin(0, 1).setScale(0.5);
+    this.add.image(266, this.mapHeight - 1920, 'cloud2').setOrigin(0, 1).setScale(0.5);
+    this.add.image(1040, this.mapHeight - 1960, 'cloud1').setOrigin(0, 1).setScale(0.5);
+    this.add.image(720, this.mapHeight - 2040, 'cloud1').setOrigin(0, 1).setScale(0.5);
+    this.add.image(-370, this.mapHeight - 2460, 'cloud2').setOrigin(0, 1).setScale(0.5);
+    this.add.image(266, this.mapHeight - 2860, 'cloud3').setOrigin(0, 1).setScale(0.5);
+    this.add.image(900, this.mapHeight - 3320, 'cloud2').setOrigin(0, 1).setScale(0.5);
+    this.add.image(140, this.mapHeight - 3670, 'cloud1').setOrigin(0, 1).setScale(0.5);
 
     this.platform = this.physics.add.staticGroup();
 
     //地面の生成
-    for (let x = 0; x * this.objectScale < this.mapWidth; x += 64) {
-      this.platform.create(x * this.objectScale, this.mapHeight, 'maps', 'terrain_stone_block_top').setScale(this.objectScale).setOrigin(0, 1).refreshBody();
+    for (let x = 0; x * this.objectScale < this.mapWidth; x += 62) {
+      this.platform.create(x * this.objectScale, this.mapHeight, 'maps', 'terrain_grass_block_top').setScale(this.objectScale).setOrigin(0, 1).refreshBody();
     }
 
-    new GroundBlock(this, this.platform, 360, this.mapHeight - 200, 3, 'right', 'stone');
-    new GroundBlock(this, this.platform, 540, this.mapHeight - 300, 3, 'right', 'stone');
+    new GroundBlock(this, this.platform, 360, this.mapHeight - 200, 3, 'right', 'grass');
+    new GroundBlock(this, this.platform, 540, this.mapHeight - 300, 3, 'right', 'grass');
 
     this.cameras.main.setBounds(0, 0, this.mapWidth, this.mapHeight); //カメラの移動範囲
     this.physics.world.setBounds(0, 0, this.mapWidth, this.mapHeight); //物理演算の範囲
@@ -140,9 +164,9 @@ class MainScene extends Phaser.Scene {
 
             //着地点から見て左右に1つずつ生成する
             if (i === 1) {
-              new GroundBlock(this, this.platform, randomX[0], this.currentGroundY - randomY, randomLength, 'left', 'stone');
+              new GroundBlock(this, this.platform, randomX[0], this.currentGroundY - randomY, randomLength, 'left', 'grass');
             } else {
-              new GroundBlock(this, this.platform, randomX[1], this.currentGroundY - randomY, randomLength, 'right', 'stone');
+              new GroundBlock(this, this.platform, randomX[1], this.currentGroundY - randomY, randomLength, 'right', 'grass');
             }
           }
         }

@@ -66,7 +66,7 @@ class GroundBlock {
     } else if (length === 2) { //長さ2のブロック
       const blockList = [];
       let resultBlockList;
-      const offsetX = direction === 'right' ? 64 : -64;
+      const offsetX = direction === 'right' ? 62 : -62;
 
       const leftBlock = scene.add.sprite(x, y, 'maps', sideBlock2);
       blockList.push(leftBlock);
@@ -94,7 +94,7 @@ class GroundBlock {
     } else { //長さ3以上のブロック
       const blockList = [];
       let resultBlockList;
-      const offsetX = direction === 'right' ? 64 : -64;
+      const offsetX = direction === 'right' ? 62 : -62;
 
       const leftBlock = scene.add.sprite(x, y, 'maps', sideBlock2);
       blockList.push(leftBlock);

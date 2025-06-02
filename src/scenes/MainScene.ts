@@ -10,8 +10,6 @@ class MainScene extends Phaser.Scene {
   private platform!: Phaser.Physics.Arcade.StaticGroup;
   private currentGroundY: number = 4000;
   private logFlg = false;
-  // private playerX: number | null = null;
-  // private playerY: number | null = null;
 
   //ステージの広さ
   private mapWidth: number = 1280;
@@ -23,6 +21,16 @@ class MainScene extends Phaser.Scene {
   private score: number = this.mapHeight - this.currentGroundY;
   private uiScore!: Phaser.GameObjects.Text;
 
+  //パワーゲージ生成
+  private gaugeContainer!: Phaser.GameObjects.Container;
+  private gaugeX: number = 50;
+  private gaugeY: number = 400;
+  private gaugeWidth: number = 20;
+  private gaugeMaxHeight: number = 200;
+  private flickFlg: boolean = false;
+
+  // private gaugeGradient!: Phaser.GameObjects.Graphics;
+  private gaugeMask!: Phaser.GameObjects.Graphics;
 
   constructor() {
     super({ key: 'MainScene' });
@@ -74,7 +82,7 @@ class MainScene extends Phaser.Scene {
       this.platform.create(x * this.objectScale, this.mapHeight, 'maps', 'terrain_grass_block_top').setScale(this.objectScale).setOrigin(0, 1).refreshBody();
     }
 
-    new GroundBlock(this, this.platform, 360, this.mapHeight - 200, 3, 'right', 'grass');
+    new GroundBlock(this, this.platform, 360, this.mapHeight - 170, 3, 'right', 'grass');
     new GroundBlock(this, this.platform, 540, this.mapHeight - 300, 3, 'right', 'grass');
 
     this.cameras.main.setBounds(0, 0, this.mapWidth, this.mapHeight); //カメラの移動範囲
@@ -88,6 +96,28 @@ class MainScene extends Phaser.Scene {
     });
 
     this.cameras.main.startFollow(this.player.sprite, true, 1, 1); //カメラの追従設定
+
+    //パワーゲージ生成
+    this.gaugeContainer = this.add.container().setScrollFactor(0);
+    this.gaugeX = this.cameras.main.width - 20;
+    this.gaugeY = this.cameras.main.height - 20;
+    this.gaugeWidth = 20;
+    this.gaugeMaxHeight = 200;
+
+    // this.gaugeGradient = this.add.graphics();
+    this.gaugeMask = this.add.graphics();
+    this.gaugeMask.setDepth(20);
+
+    this.gaugeContainer.add([this.gaugeMask]);
+
+    this.input.on('pointerdown', (_pointer: Phaser.Input.Pointer) => {
+      this.flickFlg = true;
+    });
+
+    this.input.on('pointerup', (_pointer: Phaser.Input.Pointer) => {
+      this.flickFlg = false;
+      this.updatePowerGauge(0);
+    });
 
     ////////////////////////// デバッグモード //////////////////////////
     // this.physics.world.createDebugGraphic();
@@ -175,6 +205,12 @@ class MainScene extends Phaser.Scene {
       this.logFlg = false;
     }
 
+    //パワーゲージ可変
+    if (this.flickFlg) {
+      const dragPercent = this.player.getJumpPowerPercent();
+      this.updatePowerGauge(dragPercent);
+    }
+
     //ゲームオーバー処理
     if ((this.player.sprite.body as Phaser.Physics.Arcade.Body).y && (this.player.sprite.body as Phaser.Physics.Arcade.Body).y - this.currentGroundY > 300) {
       this.add.rectangle(0, 0, this.mapWidth, this.mapHeight, 0x000000, 0.8).setDepth(10).setOrigin(0, 0);
@@ -182,11 +218,57 @@ class MainScene extends Phaser.Scene {
       const gameoverScore = this.add.text(this.cameras.main.width / 2, this.cameras.main.height / 2 + 60, `今回のスコア：${this.score / 100}m`, { fontSize: 32, fontStyle: 'bold', padding: { x: 10, y: 10 } }).setOrigin(0.5, 0.5).setDepth(10);
       gameoverTxt.setScrollFactor(0);
       gameoverScore.setScrollFactor(0);
+
+      // // ボタン作成
+      // const resetButton = this.add.text(this.cameras.main.width / 2, this.cameras.main.height / 2 + 120, 'リセット', {
+      //   fontSize: '24px',
+      //   backgroundColor: '#ff0000',
+      //   padding: { left: 10, right: 10, top: 5, bottom: 5 },
+      // })
+      // resetButton.setOrigin(0.5, 0).setDepth(10).setScrollFactor(0);
+      // resetButton.setInteractive();
+
+      // resetButton.on('pointerdown', () => {
+      //   this.scene.resume();
+      //   this.scene.restart(); // シーンをリセット
+      // });
+
       this.scene.pause();
     }
 
     this.score = this.mapHeight - this.currentGroundY;
     this.uiScore.setText(`登った高さ:${this.score / 100}m`);
+  }
+
+  private getColor(t: number) {
+    // 0〜0.5は 緑→黄、0.5〜1は 黄→赤
+    let r, g;
+    if (t < 0.5) {
+      // 緑 (0,255,0) → 黄 (255,255,0)
+      r = 255 * (t * 2);
+      g = 255;
+    } else {
+      // 黄 (255,255,0) → 赤 (255,0,0)
+      r = 255;
+      g = 255 * (1 - (t - 0.5) * 2);
+    }
+    return Phaser.Display.Color.GetColor(r, g, 0);
+  };
+
+
+  // パワーゲージ更新関数
+  private updatePowerGauge(percent: number): void {
+    const currentHeight = percent * this.gaugeMaxHeight;
+
+    this.gaugeMask.clear();
+    this.gaugeMask.fillStyle(this.getColor(percent), 1); // 透明部分を黒にする
+    this.gaugeMask.fillRect(
+      this.gaugeX - this.gaugeWidth / 2,
+      this.gaugeY - currentHeight,
+      this.gaugeWidth,
+      currentHeight
+    );
+
   }
 }
 
@@ -210,6 +292,7 @@ class MainScene extends Phaser.Scene {
 //   //自分の着地位置から左右に1か所ずつ足場生成用のX座標を生成
 //   return [Math.floor(Math.random() * leftWidth) + leftMin, Math.floor(Math.random() * rightWidth) + rightMin];
 // }
+
 
 function blockCreateRondomX2(
   leftPoint: number,

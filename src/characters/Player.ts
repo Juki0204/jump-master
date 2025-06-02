@@ -14,6 +14,10 @@ class Player {
   private airMoveVelocityX: number = 0;
   private flickFlg: boolean = false;
 
+  private currentDragDistance: number = 0;
+  private minDistance: number = 30;
+  private maxDistance: number = 300;
+
   constructor(scene: Phaser.Scene, x: number, y: number) {
     this.scene = scene;
 
@@ -33,7 +37,15 @@ class Player {
       this.touchStartX = pointer.x;
       this.touchStartY = pointer.y;
       this.flickFlg = true;
-      console.log(this.touchStartX, this.touchStartY);
+      this.currentDragDistance = 0;
+    });
+
+    this.scene.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
+      if (this.touchStartX !== null && this.touchStartY !== null) {
+        const dragX = this.touchStartX - pointer.x;
+        const dragY = Math.abs(this.touchStartY - pointer.y);
+        this.currentDragDistance = Math.sqrt(dragX ** 2 + dragY ** 2);
+      }
     });
 
     this.scene.input.on('pointerup', (pointer: Phaser.Input.Pointer) => {
@@ -51,16 +63,17 @@ class Player {
       const directionY = dragY / dragDistance;
 
       // 距離に応じたジャンプパワー（最大900）
-      const jumpPower = Phaser.Math.Clamp(dragDistance * 10, 300, 900);
+      const jumpPower = Phaser.Math.Clamp(dragDistance * 3, 100, 900);
 
       const angleRad = Math.atan2(-directionY, directionX);
       const angleDeg = Phaser.Math.RadToDeg(angleRad);
       const absAngleFromHorizontal = angleDeg;
 
-      console.log(absAngleFromHorizontal);
       // 反対方向にジャンプ（マイナスをつける）
       const velocityX = directionX * jumpPower * 0.7; // 横方向は調整して抑えめに
       const velocityY = -directionY * jumpPower;
+
+      console.log(absAngleFromHorizontal);
 
       if (absAngleFromHorizontal > -90) {
         this.direction = 'right';
@@ -89,8 +102,6 @@ class Player {
 
       this.touchStartX = null;
       this.touchStartY = null;
-
-      console.log(this.standardOffsetX);
     });
   }
 
@@ -111,6 +122,15 @@ class Player {
   //     scene.load.image(frameKey, `assets/player_jump2/Armature_${frameKey}.png`);
   //   }
   // }
+
+  //引っ張った
+  public getJumpPowerPercent(): number {
+    return Phaser.Math.Clamp(
+      (this.currentDragDistance - this.minDistance) / (this.maxDistance - this.minDistance),
+      0,
+      1
+    );
+  }
 
   static preload(scene: Phaser.Scene) {
     for (let i = 0; i < 35; i++) {

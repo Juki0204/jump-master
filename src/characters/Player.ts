@@ -85,20 +85,20 @@ class Player {
         this.standardOffsetX = this.sprite.width / 2 - 35;
       }
 
-      // if (-150 < absAngleFromHorizontal && absAngleFromHorizontal < -30) {
-      this.isJump = true;
-      this.airMoveVelocityX = velocityX;
-      this.sprite.setVelocityY(velocityY);
+      if (pointer.y > this.touchStartY) {
+        this.isJump = true;
+        this.airMoveVelocityX = velocityX;
+        this.sprite.setVelocityY(velocityY);
 
-      this.sprite.anims.play('jump').once('animationcomplete', () => {
-        if (this.isJump) {
-          this.isJump = false;
-          this.sprite.anims.play('idle', true);
-        }
-      });
-      // } else {
-      //   return;
-      // }
+        this.sprite.anims.play('jump').once('animationcomplete', () => {
+          if (this.isJump) {
+            this.isJump = false;
+            this.sprite.anims.play('idle', true);
+          }
+        });
+      } else {
+        return;
+      }
 
       this.touchStartX = null;
       this.touchStartY = null;

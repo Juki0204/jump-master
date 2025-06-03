@@ -28,6 +28,8 @@ class MainScene extends Phaser.Scene {
   private gaugeWidth: number = 20;
   private gaugeMaxHeight: number = 200;
   private flickFlg: boolean = false;
+  private startY: number = 0;
+  private flickDir: 'minus' | 'plus' | 'equal' = 'equal';
 
   // private gaugeGradient!: Phaser.GameObjects.Graphics;
   private gaugeMask!: Phaser.GameObjects.Graphics;
@@ -110,8 +112,17 @@ class MainScene extends Phaser.Scene {
 
     this.gaugeContainer.add([this.gaugeMask]);
 
-    this.input.on('pointerdown', (_pointer: Phaser.Input.Pointer) => {
+    this.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
       this.flickFlg = true;
+      this.startY = pointer.y;
+    });
+
+    this.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
+      if (this.startY < pointer.y) {
+        this.flickDir = 'plus';
+      } else {
+        this.flickDir = 'minus';
+      }
     });
 
     this.input.on('pointerup', (_pointer: Phaser.Input.Pointer) => {
@@ -177,10 +188,10 @@ class MainScene extends Phaser.Scene {
         if (currentMoreBlockCount <= 2 && this.currentGroundY < this.mapHeight - 290) {
           const currentBlock = this.platform.children.entries.filter(block => (block as Phaser.Physics.Arcade.Sprite).y === this.currentGroundY);
 
-          console.log(
-            (currentBlock[0] as Phaser.Physics.Arcade.Sprite).x,
-            (currentBlock[currentBlock.length - 1] as Phaser.Physics.Arcade.Sprite).x + (currentBlock[currentBlock.length - 1] as Phaser.Physics.Arcade.Sprite).body!.width
-          );
+          // console.log(
+          //   (currentBlock[0] as Phaser.Physics.Arcade.Sprite).x,
+          //   (currentBlock[currentBlock.length - 1] as Phaser.Physics.Arcade.Sprite).x + (currentBlock[currentBlock.length - 1] as Phaser.Physics.Arcade.Sprite).body!.width
+          // );
 
           const leftEndPoint = (currentBlock[0] as Phaser.Physics.Arcade.Sprite).body!.x;
           const rightEndPoint = (currentBlock[currentBlock.length - 1] as Phaser.Physics.Arcade.Sprite).x + (currentBlock[currentBlock.length - 1] as Phaser.Physics.Arcade.Sprite).body!.width;
@@ -206,32 +217,29 @@ class MainScene extends Phaser.Scene {
     }
 
     //パワーゲージ可変
-    if (this.flickFlg) {
+    if (this.flickFlg && this.flickDir === 'plus') {
       const dragPercent = this.player.getJumpPowerPercent();
       this.updatePowerGauge(dragPercent);
     }
 
     //ゲームオーバー処理
-    if ((this.player.sprite.body as Phaser.Physics.Arcade.Body).y && (this.player.sprite.body as Phaser.Physics.Arcade.Body).y - this.currentGroundY > 300) {
+    if ((this.player.sprite.body as Phaser.Physics.Arcade.Body).y && (this.player.sprite.body as Phaser.Physics.Arcade.Body).y - this.currentGroundY > 290) {
       this.add.rectangle(0, 0, this.mapWidth, this.mapHeight, 0x000000, 0.8).setDepth(10).setOrigin(0, 0);
       const gameoverTxt = this.add.text(this.cameras.main.width / 2, this.cameras.main.height / 2, 'GAME OVER', { fontSize: 64, fontStyle: 'bold' }).setOrigin(0.5, 0.5).setDepth(10);
       const gameoverScore = this.add.text(this.cameras.main.width / 2, this.cameras.main.height / 2 + 60, `今回のスコア：${this.score / 100}m`, { fontSize: 32, fontStyle: 'bold', padding: { x: 10, y: 10 } }).setOrigin(0.5, 0.5).setDepth(10);
       gameoverTxt.setScrollFactor(0);
       gameoverScore.setScrollFactor(0);
 
-      // // ボタン作成
-      // const resetButton = this.add.text(this.cameras.main.width / 2, this.cameras.main.height / 2 + 120, 'リセット', {
-      //   fontSize: '24px',
-      //   backgroundColor: '#ff0000',
-      //   padding: { left: 10, right: 10, top: 5, bottom: 5 },
-      // })
-      // resetButton.setOrigin(0.5, 0).setDepth(10).setScrollFactor(0);
-      // resetButton.setInteractive();
+      this.scene.pause();
+    }
 
-      // resetButton.on('pointerdown', () => {
-      //   this.scene.resume();
-      //   this.scene.restart(); // シーンをリセット
-      // });
+    //ゲームクリア処理
+    if (this.currentGroundY < 300) {
+      this.add.rectangle(0, 0, this.mapWidth, this.mapHeight, 0x000000, 0.8).setDepth(10).setOrigin(0, 0);
+      const gameClearTxt = this.add.text(this.cameras.main.width / 2, this.cameras.main.height / 2, 'CLEAR!', { fontSize: 64, fontStyle: 'bold' }).setOrigin(0.5, 0.5).setDepth(10);
+      const gameClearScore = this.add.text(this.cameras.main.width / 2, this.cameras.main.height / 2 + 60, `${this.score / 100}m まで登った！`, { fontSize: 32, fontStyle: 'bold', padding: { x: 10, y: 10 } }).setOrigin(0.5, 0.5).setDepth(10);
+      gameClearTxt.setScrollFactor(0);
+      gameClearScore.setScrollFactor(0);
 
       this.scene.pause();
     }

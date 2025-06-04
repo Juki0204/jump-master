@@ -97,11 +97,11 @@ class MainScene extends Phaser.Scene {
       this.currentGroundY = (groundObj as Phaser.Physics.Arcade.Sprite).y;
     });
 
-    this.cameras.main.startFollow(this.player.sprite, true, 1, 1); //カメラの追従設定
+    this.cameras.main.startFollow(this.player.sprite, true, 1, 1, -10, 0); //カメラの追従設定
 
     //パワーゲージ生成
-    this.gaugeContainer = this.add.container().setScrollFactor(0);
-    this.gaugeX = this.cameras.main.width - 20;
+    this.gaugeContainer = this.add.container().setScrollFactor(0).setDepth(2);
+    this.gaugeX = 20;
     this.gaugeY = this.cameras.main.height - 20;
     this.gaugeWidth = 20;
     this.gaugeMaxHeight = 200;

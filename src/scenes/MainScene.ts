@@ -2,6 +2,8 @@ import Phaser from "phaser";
 import Player from "../characters/Player";
 import GroundBlock from "../maps/GroundBlock";
 
+let titleSceneLaunched = false;
+
 class MainScene extends Phaser.Scene {
   private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
   private spaceKey!: Phaser.Input.Keyboard.Key;
@@ -10,6 +12,7 @@ class MainScene extends Phaser.Scene {
   private platform!: Phaser.Physics.Arcade.StaticGroup;
   private currentGroundY: number = 4000;
   private logFlg = false;
+  private isGameOver = false;
 
   //ステージの広さ
   private mapWidth: number = 1280;
@@ -39,6 +42,26 @@ class MainScene extends Phaser.Scene {
   }
 
   preload() {
+    // アセット読み込み時のローディング画面作成
+    const progressBarBg = this.add.graphics().setDepth(50);
+    progressBarBg.fillStyle(0xffffff, 1);
+    progressBarBg.fillRect(0, 0, this.cameras.main.width, this.cameras.main.height);
+
+    const fontFamily = '"Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif';
+
+    const progressBar = this.add.graphics().setDepth(50);
+    const loadingTxt = this.add.text(this.cameras.main.width / 2, (this.cameras.main.height / 2) - 30, 'ロード中...', { fontFamily: fontFamily, fontStyle: 'bold', fontSize: 20, color: '#333333', padding: { x: 0, y: 3 } }).setOrigin(0.5, 0.5).setDepth(50);
+    const percentTxt = this.add.text(this.cameras.main.width / 2, (this.cameras.main.height / 2) + 30, '0%', { fontFamily: fontFamily, fontStyle: 'bold', fontSize: 20, color: '#333333' }).setOrigin(0.5, 0.5).setDepth(50);
+
+    this.load.on('progress', (value: number) => {
+      progressBar.clear();
+
+      progressBar.fillStyle(0x333333, 1);
+      progressBar.fillRoundedRect(100, this.cameras.main.height / 2, (this.cameras.main.width - 200) * value, 10, 3);
+
+      percentTxt.setText(Math.floor(value * 100) + '%');
+    });
+
     Player.preload(this);
     // this.load.image('ground', 'assets/platform.png');
     this.load.image('cloud1', 'assets/maps/cloud1.png');
@@ -48,9 +71,31 @@ class MainScene extends Phaser.Scene {
     this.load.image('sky', 'assets/maps/sky.png');
     this.load.image('ground', 'assets/maps/ground.png');
     this.load.atlas('maps', 'assets/maps/spritesheet_dot.png', 'assets/maps/spritesheet.json');
+
+    // ロード完了後にタイトル画面を生成
+    this.load.on('complete', () => {
+      this.tweens.add({
+        targets: [progressBarBg, progressBar, loadingTxt, percentTxt],
+        alpha: 0,
+        duration: 10,
+        onComplete: () => {
+          progressBarBg.destroy();
+          progressBar.destroy();
+          loadingTxt.destroy();
+          percentTxt.destroy();
+
+          if (!titleSceneLaunched) {
+            this.scene.launch('TitleScene');
+            this.scene.pause();
+            titleSceneLaunched = true;
+          }
+        }
+      });
+    });
   }
 
   create() {
+
     this.cursors = this.input!.keyboard!.createCursorKeys();
     this.spaceKey = this.input!.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
     this.escKey = this.input!.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
@@ -222,26 +267,20 @@ class MainScene extends Phaser.Scene {
       this.updatePowerGauge(dragPercent);
     }
 
-    //ゲームオーバー処理
-    if ((this.player.sprite.body as Phaser.Physics.Arcade.Body).y && (this.player.sprite.body as Phaser.Physics.Arcade.Body).y - this.currentGroundY > 290) {
-      this.add.rectangle(0, 0, this.mapWidth, this.mapHeight, 0x000000, 0.8).setDepth(10).setOrigin(0, 0);
-      const gameoverTxt = this.add.text(this.cameras.main.width / 2, this.cameras.main.height / 2, 'GAME OVER', { fontSize: 64, fontStyle: 'bold' }).setOrigin(0.5, 0.5).setDepth(10);
-      const gameoverScore = this.add.text(this.cameras.main.width / 2, this.cameras.main.height / 2 + 60, `今回のスコア：${this.score / 100}m`, { fontSize: 32, fontStyle: 'bold', padding: { x: 10, y: 10 } }).setOrigin(0.5, 0.5).setDepth(10);
-      gameoverTxt.setScrollFactor(0);
-      gameoverScore.setScrollFactor(0);
+    if (!this.isGameOver) {
+      //ゲームオーバー処理
+      if ((this.player.sprite.body as Phaser.Physics.Arcade.Body).y && (this.player.sprite.body as Phaser.Physics.Arcade.Body).y - this.currentGroundY > 290) {
+        this.isGameOver = true;
+        this.scene.launch('ResultScene', { state: 'gameover', scene: this.scene, score: this.score });
+        this.scene.pause();
+      }
 
-      this.scene.pause();
-    }
-
-    //ゲームクリア処理
-    if (this.currentGroundY < 300) {
-      this.add.rectangle(0, 0, this.mapWidth, this.mapHeight, 0x000000, 0.8).setDepth(10).setOrigin(0, 0);
-      const gameClearTxt = this.add.text(this.cameras.main.width / 2, this.cameras.main.height / 2, 'CLEAR!', { fontSize: 64, fontStyle: 'bold' }).setOrigin(0.5, 0.5).setDepth(10);
-      const gameClearScore = this.add.text(this.cameras.main.width / 2, this.cameras.main.height / 2 + 60, `${this.score / 100}m まで登った！`, { fontSize: 32, fontStyle: 'bold', padding: { x: 10, y: 10 } }).setOrigin(0.5, 0.5).setDepth(10);
-      gameClearTxt.setScrollFactor(0);
-      gameClearScore.setScrollFactor(0);
-
-      this.scene.pause();
+      //ゲームクリア処理
+      if (this.currentGroundY < 300) {
+        this.isGameOver = true;
+        this.scene.launch('ResultScene', { state: 'gameclear', scene: this.scene, score: this.score });
+        this.scene.pause();
+      }
     }
 
     this.score = this.mapHeight - this.currentGroundY;

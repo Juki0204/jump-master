@@ -1,5 +1,7 @@
 import Phaser from "phaser";
 import MainScene from "./scenes/MainScene";
+import TitleScene from "./scenes/TitleScene";
+import ResultScene from "./scenes/ResultScene";
 
 function getResponsiveSize() {
   const breakpoint = 768;
@@ -28,6 +30,8 @@ const config: Phaser.Types.Core.GameConfig = {
   },
   scene: [
     MainScene,
+    TitleScene,
+    ResultScene
   ]
 };
 
